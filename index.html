@@ -138,31 +138,23 @@
         <form id="submissionForm" onsubmit="submitAnswer(event)">
             <input type="hidden" id="studentIdInput">
             <input type="hidden" id="studentImgInput">
-            
             <div class="form-group">
                 <label class="form-label">เลือกคำตอบ</label>
                 <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="tf_answer" value="True" required> ถูก (True)
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="tf_answer" value="False"> ผิด (False)
-                    </label>
+                    <label class="radio-option"><input type="radio" name="tf_answer" value="True" required> ถูก (True)</label>
+                    <label class="radio-option"><input type="radio" name="tf_answer" value="False"> ผิด (False)</label>
                 </div>
             </div>
-
             <div class="form-group">
                 <label class="form-label">คำตอบเพิ่มเติม / เหตุผล</label>
                 <textarea id="textAnswer" placeholder="พิมพ์คำตอบของคุณที่นี่..."></textarea>
             </div>
-
             <button type="submit" class="submit-btn">ส่งคำตอบ</button>
         </form>
     </div>
 </div>
 
 <script>
-    // เปิด Modal
     function openModal(name, img) {
         document.getElementById('answerModal').style.display = 'block';
         document.getElementById('studentNameDisplay').innerText = 'สำหรับ: ' + name;
@@ -170,23 +162,17 @@
         document.getElementById('studentImgInput').value = img;
         document.getElementById('submissionForm').reset();
     }
-
-    // ปิด Modal
     function closeModal() {
         document.getElementById('answerModal').style.display = 'none';
     }
-
     window.onclick = function(event) {
-        if (event.target == document.getElementById('answerModal')) {
-            closeModal();
-        }
+        if (event.target == document.getElementById('answerModal')) closeModal();
     }
 
-    // ฟังก์ชัน Reset สำหรับ Admin เท่านั้น
+    // --- แก้ไขรหัสผ่านตรงนี้ ---
     function adminReset() {
         const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
-        // *** รหัสผ่านคือ admin1234 ***
-        if (password === "admin1234") {
+        if (password === "00000") { // รหัสผ่านใหม่ 00000
             if(confirm("ยืนยันการล้างข้อมูลทั้งหมดหรือไม่?")) {
                 localStorage.removeItem('eee434_responses');
                 alert("ล้างข้อมูลเรียบร้อยแล้ว");
@@ -197,7 +183,6 @@
         }
     }
 
-    // ฟังก์ชันส่งคำตอบ
     function submitAnswer(event) {
         event.preventDefault();
         const name = document.getElementById('studentIdInput').value;
@@ -211,8 +196,7 @@
             img: img,
             choice: choice,
             note: note,
-            time: timestamp.getTime(),
-            timeString: timestamp.toLocaleTimeString('th-TH')
+            time: timestamp.getTime()
         };
 
         let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
