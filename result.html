@@ -176,18 +176,98 @@
     🌙
 </button>
 
-<script>
-    // --- Theme Logic ---
+<script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // --- 🔴 ใส่ Config ตัวเดิมที่ได้จากขั้นตอนที่ 1 ---
+    const firebaseConfig = {
+          apiKey: "AIzaSyCOO20iOMb2bWWcUoqmq3OXE2TtbSgG1ik",
+          authDomain: "eee434-project.firebaseapp.com",
+          databaseURL: "https://eee434-project-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "eee434-project",
+          storageBucket: "eee434-project.firebasestorage.app",
+          messagingSenderId: "691440469916",
+          appId: "1:691440469916:web:c7bb0dd04255fd4821aa59"
+    };
+    // ------------------------------------------------
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'responses');
+    const tbody = document.getElementById('tableBody');
+
+    // --- ทำงาน Realtime: เมื่อมีคนส่ง ข้อมูลจะเด้งขึ้นมาเอง ---
+    onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        let allData = data ? Object.values(data) : [];
+        
+        // เรียงลำดับตามเวลา
+        allData.sort((a, b) => a.time - b.time);
+        
+        renderTable(allData);
+    });
+
+    function renderTable(allData) {
+        if (allData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color:var(--sub-text);">ยังไม่มีการส่งคำตอบ</td></tr>';
+        } else {
+            tbody.innerHTML = ''; // เคลียร์ของเก่า
+            allData.forEach((item, index) => {
+                let rankClass = '';
+                if (index === 0) rankClass = 'rank-1';
+                else if (index === 1) rankClass = 'rank-2';
+                else if (index === 2) rankClass = 'rank-3';
+
+                let ansClass = item.choice === 'True' ? 'ans-true' : 'ans-false';
+                let dateObj = new Date(item.time);
+                let timeStr = dateObj.toLocaleTimeString('th-TH') + '.' + Math.floor(dateObj.getMilliseconds() / 10).toString().padStart(2, '0');
+                
+                // เช็คว่าเป็นข้อมูลล่าสุดหรือไม่ (Logic คร่าวๆ)
+                let isLatest = (index === allData.length - 1); 
+                
+                let row = `
+                    <tr class="${isLatest ? 'new-entry' : ''}">
+                        <td><div class="rank-badge ${rankClass}">${index + 1}</div></td>
+                        <td>
+                            <div class="user-profile">
+                                <img src="${item.img || 'https://via.placeholder.com/50'}" class="user-img">
+                                <div>
+                                    <div class="user-name">${item.name}</div>
+                                    ${item.note ? `<span class="note-text">"${item.note}"</span>` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="answer-tag ${ansClass}">${item.choice}</span></td>
+                        <td><span class="time-stamp">${timeStr}</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+    }
+
+    // ฟังก์ชันล้างข้อมูล (Admin)
+    window.clearData = function() {
+        const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
+        if (password === "00000") {
+            if(confirm('ยืนยันการลบประวัติการส่งทั้งหมดบน Server หรือไม่?')) {
+                remove(dbRef); // ลบจาก Firebase แล้วทุกเครื่องจะหายไปเอง
+            }
+        } else if (password !== null) {
+            alert("รหัสผ่านไม่ถูกต้อง!");
+        }
+    }
+
+    // Theme Logic
     const themeToggleBtn = document.getElementById('themeToggle');
     const htmlEl = document.documentElement;
-
-    // เช็คค่าที่บันทึกไว้เมื่อโหลดหน้า
     if (localStorage.getItem('theme') === 'dark') {
         htmlEl.setAttribute('data-theme', 'dark');
         themeToggleBtn.innerText = '☀️';
     }
-
-    function toggleTheme() {
+    window.toggleTheme = function() {
         if (htmlEl.getAttribute('data-theme') === 'dark') {
             htmlEl.removeAttribute('data-theme');
             localStorage.setItem('theme', 'light');
@@ -197,57 +277,6 @@
             localStorage.setItem('theme', 'dark');
             themeToggleBtn.innerText = '☀️';
         }
-    }
-
-    // --- Original Logic ---
-    let allData = JSON.parse(localStorage.getItem('eee434_responses'));
-    if (!Array.isArray(allData)) { allData = []; }
-    allData.sort((a, b) => a.time - b.time);
-
-    const tbody = document.getElementById('tableBody');
-
-    if (allData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color:var(--sub-text);">ยังไม่มีการส่งคำตอบ</td></tr>';
-    } else {
-        allData.forEach((item, index) => {
-            let rankClass = '';
-            if (index === 0) rankClass = 'rank-1';
-            else if (index === 1) rankClass = 'rank-2';
-            else if (index === 2) rankClass = 'rank-3';
-
-            let ansClass = item.choice === 'True' ? 'ans-true' : 'ans-false';
-            let dateObj = new Date(item.time);
-            let timeStr = dateObj.toLocaleTimeString('th-TH') + '.' + Math.floor(dateObj.getMilliseconds() / 10).toString().padStart(2, '0');
-            let isLatest = (index === allData.length - 1); 
-            
-            let row = `
-                <tr class="${isLatest ? 'new-entry' : ''}">
-                    <td><div class="rank-badge ${rankClass}">${index + 1}</div></td>
-                    <td>
-                        <div class="user-profile">
-                            <img src="${item.img || 'https://via.placeholder.com/50'}" class="user-img">
-                            <div>
-                                <div class="user-name">${item.name}</div>
-                                ${item.note ? `<span class="note-text">"${item.note}"</span>` : ''}
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="answer-tag ${ansClass}">${item.choice}</span></td>
-                    <td><span class="time-stamp">${timeStr}</span></td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
-    }
-
-    function clearData() {
-        const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
-        if (password === "00000") {
-            if(confirm('ยืนยันการลบประวัติการส่งทั้งหมดหรือไม่?')) {
-                localStorage.removeItem('eee434_responses');
-                location.reload();
-            }
-        } else if (password !== null) { alert("รหัสผ่านไม่ถูกต้อง!"); }
     }
 </script>
 
