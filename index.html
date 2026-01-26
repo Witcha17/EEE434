@@ -240,35 +240,47 @@
     </div>
 </div>
 
-<script>
-    // --- Theme Logic ---
-    const themeToggleBtn = document.getElementById('themeToggle');
-    const htmlEl = document.documentElement;
+<script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // เช็คค่าที่บันทึกไว้เมื่อโหลดหน้า
-    if (localStorage.getItem('theme') === 'dark') {
-        htmlEl.setAttribute('data-theme', 'dark');
-        themeToggleBtn.innerText = '☀️';
-    }
+    // --- 🔴 นำ Config จากขั้นตอนที่ 1 มาแปะทับตรงนี้ ---
+    const firebaseConfig = {
+              apiKey: "AIzaSyCOO20iOMb2bWWcUoqmq3OXE2TtbSgG1ik",
+              authDomain: "eee434-project.firebaseapp.com",
+              databaseURL: "https://eee434-project-default-rtdb.asia-southeast1.firebasedatabase.app",
+              projectId: "eee434-project",
+              storageBucket: "eee434-project.firebasestorage.app",
+              messagingSenderId: "691440469916",
+              appId: "1:691440469916:web:c7bb0dd04255fd4821aa59"
+    };
+    // ----------------------------------------------------
 
-    function toggleTheme() {
-        if (htmlEl.getAttribute('data-theme') === 'dark') {
-            htmlEl.removeAttribute('data-theme');
-            localStorage.setItem('theme', 'light');
-            themeToggleBtn.innerText = '🌙';
-        } else {
-            htmlEl.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-            themeToggleBtn.innerText = '☀️';
-        }
-    }
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'responses'); // ชื่อตารางใน Database
 
-    // --- Original Logic ---
-    window.onload = function() { updateGridStatus(); };
-    function updateGridStatus() {
-        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
+    // ตัวแปรเก็บข้อมูล
+    let allData = [];
+
+    // --- ฟังก์ชันโหลดข้อมูล Realtime ---
+    // เมื่อ Database มีการเปลี่ยนแปลง โค้ดนี้จะทำงานทันทีทุกเครื่อง
+    onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        // แปลง Object เป็น Array
+        allData = data ? Object.values(data) : [];
+        
+        // อัพเดทหน้าจอ
+        updateGridStatus();
+    });
+
+    // ฟังก์ชันอัพเดทสถานะการ์ด
+    window.updateGridStatus = function() {
         let submittedNames = allData.map(item => item.name);
         let cards = document.querySelectorAll('.student-card');
+        
         cards.forEach(card => {
             let nameInCard = card.querySelector('.student-no').innerText;
             if (submittedNames.includes(nameInCard)) {
@@ -276,11 +288,16 @@
                 card.onclick = null;
             } else {
                 card.classList.remove('submitted');
+                // คืนค่า onclick กลับมา (ต้องเขียนแบบ addEventListener หรือ set attribute ใหม่)
+                // เพื่อความง่าย เราจะใช้การรีเซ็ต onclick ผ่าน HTML attribute
+                let imgUrl = card.querySelector('img').src;
+                card.setAttribute('onclick', `openModal('${nameInCard}', '${imgUrl}')`);
             }
         });
     }
-    function openModal(name, img) {
-        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
+
+    // ฟังก์ชันเปิด Modal (ต้องประกาศแบบ window เพื่อให้ HTML เรียกใช้ได้ เพราะเราใช้ type="module")
+    window.openModal = function(name, img) {
         if (allData.some(item => item.name === name)) {
             alert("สมาชิกท่านนี้ได้ส่งคำตอบไปแล้ว!");
             return;
@@ -291,33 +308,86 @@
         document.getElementById('studentImgInput').value = img;
         document.getElementById('submissionForm').reset();
     }
-    function closeModal() { document.getElementById('answerModal').style.display = 'none'; }
-    window.onclick = function(event) { if (event.target == document.getElementById('answerModal')) closeModal(); }
-    function adminReset() {
-        const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
-        if (password === "00000") {
-            if(confirm("ยืนยันการล้างข้อมูลทั้งหมดหรือไม่? (ผู้ใช้จะสามารถส่งคำตอบใหม่ได้)")) {
-                localStorage.removeItem('eee434_responses');
-                alert("ล้างข้อมูลเรียบร้อยแล้ว");
-                location.reload();
-            }
-        } else if (password !== null) { alert("รหัสผ่านไม่ถูกต้อง!"); }
+
+    window.closeModal = function() {
+        document.getElementById('answerModal').style.display = 'none';
     }
-    function submitAnswer(event) {
+
+    // ปิด Modal เมื่อคลิกข้างนอก
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('answerModal')) closeModal();
+    }
+
+    // ฟังก์ชันส่งคำตอบ (ส่งขึ้น Cloud)
+    window.submitAnswer = function(event) {
         event.preventDefault();
         const name = document.getElementById('studentIdInput').value;
-        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
-        if (allData.some(item => item.name === name)) { alert("ไม่สามารถส่งซ้ำได้"); return; }
+
+        // เช็คซ้ำอีกรอบ
+        if (allData.some(item => item.name === name)) {
+            alert("มีการส่งคำตอบไปแล้วระหว่างที่คุณกำลังกรอก");
+            closeModal();
+            return;
+        }
+
         const img = document.getElementById('studentImgInput').value;
         const choice = document.querySelector('input[name="tf_answer"]:checked').value;
         const note = document.getElementById('textAnswer').value;
-        const timestamp = new Date();
-        const newData = { name: name, img: img, choice: choice, note: note, time: timestamp.getTime() };
-        allData.push(newData);
-        localStorage.setItem('eee434_responses', JSON.stringify(allData));
-        window.location.href = 'result.html';
+        const timestamp = new Date().getTime();
+
+        const newData = {
+            name: name,
+            img: img,
+            choice: choice,
+            note: note,
+            time: timestamp
+        };
+
+        // ส่งข้อมูลขึ้น Firebase
+        push(dbRef, newData)
+            .then(() => {
+                // ส่งสำเร็จ ไปหน้า Result
+                window.location.href = 'result.html';
+            })
+            .catch((error) => {
+                alert("เกิดข้อผิดพลาด: " + error.message);
+            });
+    }
+
+    // ฟังก์ชันล้างข้อมูล (Admin)
+    window.adminReset = function() {
+        const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
+        if (password === "00000") {
+            if(confirm("ยืนยันการล้างข้อมูลบน Server ทั้งหมดหรือไม่?")) {
+                remove(dbRef).then(() => {
+                    alert("ล้างข้อมูลเรียบร้อยแล้ว ทุกเครื่องจะรีเซ็ตอัตโนมัติ");
+                });
+            }
+        } else if (password !== null) {
+            alert("รหัสผ่านไม่ถูกต้อง!");
+        }
+    }
+
+    // Theme Logic (คงเดิม)
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const htmlEl = document.documentElement;
+    if (localStorage.getItem('theme') === 'dark') {
+        htmlEl.setAttribute('data-theme', 'dark');
+        themeToggleBtn.innerText = '☀️';
+    }
+    window.toggleTheme = function() {
+        if (htmlEl.getAttribute('data-theme') === 'dark') {
+            htmlEl.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            themeToggleBtn.innerText = '🌙';
+        } else {
+            htmlEl.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            themeToggleBtn.innerText = '☀️';
+        }
     }
 </script>
 
 </body>
 </html>
+
