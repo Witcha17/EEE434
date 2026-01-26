@@ -20,9 +20,10 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-x: auto; /* เพิ่ม Scroll แนวนอนเผื่อตารางล้น */
         }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 500px; /* กันตารางบีบเกินไป */ }
         th { text-align: left; padding: 15px; background: #fff5f2; color: var(--kmutt-orange); font-weight: 600; border-radius: 8px 8px 0 0; }
         td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
@@ -57,6 +58,26 @@
 
         .new-entry { animation: highlight 2s ease-out; }
         @keyframes highlight { 0% { background-color: rgba(231, 64, 16, 0.2); } 100% { background-color: transparent; } }
+
+        /* ================= RESPONSIVE DESIGN (เพิ่มใหม่) ================= */
+        @media (max-width: 768px) {
+            .header-result > div { flex-direction: column; } /* ให้โลโก้กับข้อความเรียงแนวตั้ง */
+            .header-result img { height: 60px !important; margin-bottom: 10px; }
+            .header-result h1 { font-size: 1.5rem; }
+
+            .container { margin: 20px auto; padding: 0 15px; }
+            .result-card { padding: 15px; }
+            
+            /* ปรับตารางให้แน่นขึ้นบนมือถือ */
+            th, td { padding: 10px 8px; font-size: 0.9rem; }
+            .user-img { width: 35px; height: 35px; }
+            .user-name { font-size: 0.9rem; }
+            .rank-badge { width: 25px; height: 25px; font-size: 0.8rem; }
+            .answer-tag { padding: 3px 10px; font-size: 0.8rem; }
+            
+            /* ซ่อนรายละเอียดที่ไม่จำเป็นมากหากจอเล็กจริงๆ */
+            .time-stamp { font-size: 0.8rem; }
+        }
     </style>
 </head>
 <body>
@@ -74,7 +95,7 @@
 <div class="container">
     <div class="result-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0;">รายการส่งคำตอบล่าสุด</h2>
+            <h2 style="margin: 0; font-size: 1.4rem;">รายการส่งคำตอบล่าสุด</h2>
             <button onclick="clearData()" style="font-size: 0.8rem; color: #999; background: none; border: none; cursor: pointer;">[ล้างประวัติ]</button>
         </div>
         
@@ -84,7 +105,7 @@
                     <th width="10%">#</th>
                     <th width="40%">สมาชิก</th>
                     <th width="20%">คำตอบ</th>
-                    <th width="30%">เวลาที่ส่ง (วินาที)</th>
+                    <th width="30%">เวลา</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -98,20 +119,12 @@
 </div>
 
 <script>
-    // ดึงข้อมูลและตรวจสอบว่าเป็น Array หรือไม่
     let allData = JSON.parse(localStorage.getItem('eee434_responses'));
-    
-    // ถ้าไม่มีข้อมูล หรือข้อมูลผิดพลาด ให้เริ่มใหม่เป็น Array ว่างๆ
-    if (!Array.isArray(allData)) {
-        allData = [];
-    }
-
-    // เรียงลำดับตามเวลา
+    if (!Array.isArray(allData)) { allData = []; }
     allData.sort((a, b) => a.time - b.time);
 
     const tbody = document.getElementById('tableBody');
 
-    // สร้างตาราง
     if (allData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color:#999;">ยังไม่มีการส่งคำตอบ</td></tr>';
     } else {
@@ -122,11 +135,8 @@
             else if (index === 2) rankClass = 'rank-3';
 
             let ansClass = item.choice === 'True' ? 'ans-true' : 'ans-false';
-            
-            // คำนวณเวลา
             let dateObj = new Date(item.time);
             let timeStr = dateObj.toLocaleTimeString('th-TH') + '.' + Math.floor(dateObj.getMilliseconds() / 10).toString().padStart(2, '0');
-
             let isLatest = (index === allData.length - 1); 
             
             let row = `
@@ -142,24 +152,21 @@
                         </div>
                     </td>
                     <td><span class="answer-tag ${ansClass}">${item.choice}</span></td>
-                    <td><span class="time-stamp">⏱ ${timeStr} วินาที</span></td>
+                    <td><span class="time-stamp">${timeStr}</span></td>
                 </tr>
             `;
             tbody.innerHTML += row;
         });
     }
 
-    // --- แก้ไขรหัสผ่านตรงนี้ ---
     function clearData() {
         const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
-        if (password === "00000") { // รหัสผ่านใหม่ 00000
+        if (password === "00000") {
             if(confirm('ยืนยันการลบประวัติการส่งทั้งหมดหรือไม่?')) {
                 localStorage.removeItem('eee434_responses');
                 location.reload();
             }
-        } else if (password !== null) {
-            alert("รหัสผ่านไม่ถูกต้อง!");
-        }
+        } else if (password !== null) { alert("รหัสผ่านไม่ถูกต้อง!"); }
     }
 </script>
 
