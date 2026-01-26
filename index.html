@@ -6,341 +6,54 @@
     <title>EEE434 Member Board | KMUTT</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --kmutt-orange: #e74010;
-            --dark-grey: #333333;
-            --light-bg: #f0f2f5;
-            --white: #ffffff;
-        }
-
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: var(--light-bg);
-            margin: 0;
-            padding: 0;
-            color: var(--dark-grey);
-        }
-
-        /* --- Header Layout --- */
-        header {
-            background-color: var(--white);
-            border-bottom: 5px solid var(--kmutt-orange);
-            padding: 15px 5%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-
-        .logo-kmutt {
-            height: 90px;
-            width: auto;
-        }
-        .logo-dept {
-            height: 90px;
-            width: auto;
-        }
-
-        .header-text {
-            border-left: 2px solid #ddd;
-            padding-left: 25px;
-        }
-
-        .header-text h1 {
-            margin: 0;
-            font-size: 1.35rem;
-            color: var(--kmutt-orange);
-            letter-spacing: 0.5px;
-        }
-
-        .header-text p {
-            margin: 5px 0 0 0;
-            font-size: 1rem;
-            color: #666;
-            font-weight: 300;
-        }
-
-        /* --- Main Content --- */
-        .container {
-            max-width: 1300px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-
-        .section-title {
-            text-align: left;
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            color: var(--dark-grey);
-            border-left: 8px solid var(--kmutt-orange);
-            padding-left: 15px;
-        }
-
-        /* --- Instructor Card --- */
-        .instructor-box {
-            background: linear-gradient(135deg, var(--white) 0%, #fff5f2 100%);
-            border-radius: 30px;
-            padding: 40px;
-            display: flex;
-            align-items: center;
-            gap: 50px;
-            box-shadow: 0 15px 35px rgba(231, 64, 16, 0.1);
-            margin-bottom: 60px;
-            border: 1px solid rgba(231, 64, 16, 0.1);
-        }
-
-        .instructor-img {
-            width: 300px;
-            height: 300px;
-            border-radius: 25px;
-            object-fit: cover;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            border: 6px solid var(--white);
-        }
-
-        .instructor-label {
-            display: inline-block;
-            background: var(--kmutt-orange);
-            color: white;
-            padding: 5px 20px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            font-weight: 500;
-            letter-spacing: 1px;
-        }
-
-        .instructor-info h2 {
-            font-size: 2.4rem;
-            margin: 0 0 10px 0;
-            color: var(--dark-grey);
-        }
-
-        .instructor-info p {
-            font-size: 1.3rem;
-            color: var(--kmutt-orange);
-            margin: 0;
-            font-weight: 400;
-        }
-
-        /* --- Student Grid --- */
-        .student-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 25px;
-        }
-
-        .student-card {
-            background: var(--white);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border: 1px solid #edf0f2;
-            cursor: pointer; /* เพิ่ม cursor pointer เพื่อให้รู้ว่าคลิกได้ */
-            position: relative;
-        }
-
-        .student-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 15px 30px rgba(231, 64, 16, 0.2);
-            border-color: var(--kmutt-orange);
-        }
-
-        .student-img {
-            width: 100%;
-            height: 230px;
-            object-fit: cover;
-        }
-
-        .student-info {
-            padding: 15px;
-            text-align: center;
-            background: var(--white);
-        }
-
-        .student-no {
-            font-size: 0.8rem;
-            color: var(--kmutt-orange);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        /* --- MODAL (POPUP) STYLES --- */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 2000; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.6); 
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto; 
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            position: relative;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {transform: translateY(-50px); opacity: 0;}
-            to {transform: translateY(0); opacity: 1;}
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: var(--kmutt-orange);
-            text-decoration: none;
-        }
-
-        .modal-header {
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
+        /* ... (ใช้ CSS เดิมจากไฟล์ก่อนหน้าทั้งหมด) ... */
+        :root { --kmutt-orange: #e74010; --dark-grey: #333333; --light-bg: #f0f2f5; --white: #ffffff; }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--light-bg); margin: 0; padding: 0; color: var(--dark-grey); }
+        header { background-color: var(--white); border-bottom: 5px solid var(--kmutt-orange); padding: 15px 5%; display: flex; align-items: center; justify-content: flex-start; gap: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo-container { display: flex; align-items: center; gap: 25px; }
+        .logo-kmutt, .logo-dept { height: 90px; width: auto; }
+        .header-text { border-left: 2px solid #ddd; padding-left: 25px; }
+        .header-text h1 { margin: 0; font-size: 1.35rem; color: var(--kmutt-orange); letter-spacing: 0.5px; }
+        .header-text p { margin: 5px 0 0 0; font-size: 1rem; color: #666; font-weight: 300; }
+        .container { max-width: 1300px; margin: 50px auto; padding: 0 20px; }
+        .section-title { text-align: left; font-size: 1.8rem; margin-bottom: 30px; color: var(--dark-grey); border-left: 8px solid var(--kmutt-orange); padding-left: 15px; }
+        .instructor-box { background: linear-gradient(135deg, var(--white) 0%, #fff5f2 100%); border-radius: 30px; padding: 40px; display: flex; align-items: center; gap: 50px; box-shadow: 0 15px 35px rgba(231, 64, 16, 0.1); margin-bottom: 60px; border: 1px solid rgba(231, 64, 16, 0.1); }
+        .instructor-img { width: 300px; height: 300px; border-radius: 25px; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 6px solid var(--white); }
+        .instructor-label { display: inline-block; background: var(--kmutt-orange); color: white; padding: 5px 20px; border-radius: 50px; font-size: 0.9rem; margin-bottom: 15px; font-weight: 500; letter-spacing: 1px; }
+        .instructor-info h2 { font-size: 2.4rem; margin: 0 0 10px 0; color: var(--dark-grey); }
+        .instructor-info p { font-size: 1.3rem; color: var(--kmutt-orange); margin: 0; font-weight: 400; }
+        .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; }
+        .student-card { background: var(--white); border-radius: 20px; overflow: hidden; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #edf0f2; cursor: pointer; }
+        .student-card:hover { transform: translateY(-12px); box-shadow: 0 15px 30px rgba(231, 64, 16, 0.2); border-color: var(--kmutt-orange); }
+        .student-img { width: 100%; height: 230px; object-fit: cover; }
+        .student-info { padding: 15px; text-align: center; background: var(--white); }
+        .student-no { font-size: 0.8rem; color: var(--kmutt-orange); font-weight: 600; text-transform: uppercase; }
         
-        .modal-header h3 {
-            margin: 0;
-            color: var(--kmutt-orange);
-        }
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from {transform: translateY(-50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: var(--kmutt-orange); }
+        .modal-header { border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; color: var(--kmutt-orange); }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 10px; font-weight: 500; color: var(--dark-grey); }
+        .radio-group { display: flex; gap: 20px; }
+        .radio-option { display: flex; align-items: center; gap: 8px; cursor: pointer; background: #f8f9fa; padding: 10px 20px; border-radius: 10px; border: 1px solid #ddd; transition: all 0.2s; flex: 1; justify-content: center; }
+        .radio-option:hover { border-color: var(--kmutt-orange); background: #fff5f2; }
+        .radio-option input[type="radio"] { accent-color: var(--kmutt-orange); transform: scale(1.2); }
+        textarea { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-family: 'Kanit', sans-serif; resize: vertical; min-height: 100px; box-sizing: border-box; }
+        textarea:focus { outline: none; border-color: var(--kmutt-orange); }
+        .submit-btn { width: 100%; padding: 15px; background-color: var(--kmutt-orange); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 500; cursor: pointer; transition: background 0.2s; font-family: 'Kanit', sans-serif; }
+        .submit-btn:hover { background-color: #c9350b; }
 
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: var(--dark-grey);
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 20px;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            background: #f8f9fa;
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            transition: all 0.2s;
-            flex: 1;
-            justify-content: center;
-        }
-
-        .radio-option:hover {
-            border-color: var(--kmutt-orange);
-            background: #fff5f2;
-        }
-
-        .radio-option input[type="radio"] {
-            accent-color: var(--kmutt-orange);
-            transform: scale(1.2);
-        }
-
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1rem;
-            resize: vertical;
-            min-height: 100px;
-            box-sizing: border-box;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--kmutt-orange);
-            box-shadow: 0 0 0 3px rgba(231, 64, 16, 0.1);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--kmutt-orange);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: 'Kanit', sans-serif;
-        }
-
-        .submit-btn:hover {
-            background-color: #c9350b;
-        }
-
-        /* Mobile Responsive */
         @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                text-align: center;
-                gap: 20px;
-                padding: 25px 15px;
-            }
-            .header-text {
-                border-left: none;
-                padding-left: 0;
-                border-top: 1px solid #eee;
-                padding-top: 20px;
-                width: 100%;
-            }
-            .logo-kmutt, .logo-dept {
-                height: 80px;
-            }
-            .instructor-box {
-                flex-direction: column;
-                text-align: center;
-                padding: 30px 20px;
-                gap: 20px;
-            }
-            .instructor-img {
-                width: 250px;
-                height: 250px;
-            }
-            .instructor-info h2 {
-                font-size: 1.8rem;
-            }
+            header { flex-direction: column; text-align: center; gap: 20px; padding: 25px 15px; }
+            .header-text { border-left: none; padding-left: 0; border-top: 1px solid #eee; padding-top: 20px; width: 100%; }
+            .logo-kmutt, .logo-dept { height: 80px; }
+            .instructor-box { flex-direction: column; padding: 30px 20px; gap: 20px; text-align: center;}
+            .instructor-img { width: 250px; height: 250px; }
         }
     </style>
 </head>
@@ -369,122 +82,95 @@
         </div>
     </div>
 
-    <h2 class="section-title">สมาชิกในคลาส <span style="font-size: 1rem; color: #666; font-weight: normal;">(คลิกที่รูปเพื่อส่งคำตอบ)</span></h2>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <button onclick="localStorage.removeItem('eee434_responses'); alert('ล้างข้อมูลเรียบร้อย');" style="background: #ccc; border:none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-family: 'Kanit';">Reset Data (Admin)</button>
+    </div>
+
+    <h2 class="section-title">สมาชิกในคลาส</h2>
     <div class="student-grid">
-        <div class="student-card" onclick="openModal('Member 01')"><img src="https://i.postimg.cc/52rz0fSL/1.png" class="student-img"><div class="student-info"><div class="student-no">Member 01</div></div></div>
-        <div class="student-card" onclick="openModal('Member 02')"><img src="https://i.postimg.cc/fRPdLMfS/2.jpg" class="student-img"><div class="student-info"><div class="student-no">Member 02</div></div></div>
-        <div class="student-card" onclick="openModal('Member 03')"><img src="https://i.postimg.cc/y8GRd7y0/3.png" class="student-img"><div class="student-info"><div class="student-no">Member 03</div></div></div>
-        <div class="student-card" onclick="openModal('Member 04')"><img src="https://i.postimg.cc/K8WTzmD7/4.png" class="student-img"><div class="student-info"><div class="student-no">Member 04</div></div></div>
-        <div class="student-card" onclick="openModal('Member 05')"><img src="https://i.postimg.cc/HkNMxT9Q/5.png" class="student-img"><div class="student-info"><div class="student-no">Member 05</div></div></div>
-        <div class="student-card" onclick="openModal('Member 06')"><img src="https://i.postimg.cc/HkNMxT9t/6.png" class="student-img"><div class="student-info"><div class="student-no">Member 06</div></div></div>
-        <div class="student-card" onclick="openModal('Member 07')"><img src="https://i.postimg.cc/4x0cdXQ5/7.png" class="student-img"><div class="student-info"><div class="student-no">Member 07</div></div></div>
-        <div class="student-card" onclick="openModal('Member 08')"><img src="https://i.postimg.cc/6pPZ3Bfz/8.png" class="student-img"><div class="student-info"><div class="student-no">Member 08</div></div></div>
-        <div class="student-card" onclick="openModal('Member 09')"><img src="https://i.postimg.cc/FH6SRhVP/9.png" class="student-img"><div class="student-info"><div class="student-no">Member 09</div></div></div>
-        <div class="student-card" onclick="openModal('Member 10')"><img src="https://i.postimg.cc/mgn9DTym/10.png" class="student-img"><div class="student-info"><div class="student-no">Member 10</div></div></div>
-        <div class="student-card" onclick="openModal('Member 11')"><img src="https://i.postimg.cc/XYP5JnkQ/11.png" class="student-img"><div class="student-info"><div class="student-no">Member 11</div></div></div>
-        <div class="student-card" onclick="openModal('Member 12')"><img src="https://i.postimg.cc/NjnXMQkP/12.png" class="student-img"><div class="student-info"><div class="student-no">Member 12</div></div></div>
-        <div class="student-card" onclick="openModal('Member 13')"><img src="https://i.postimg.cc/pLSjTPJc/13.png" class="student-img"><div class="student-info"><div class="student-no">Member 13</div></div></div>
-        <div class="student-card" onclick="openModal('Member 14')"><img src="https://i.postimg.cc/nhWmznGP/14.png" class="student-img"><div class="student-info"><div class="student-no">Member 14</div></div></div>
-        <div class="student-card" onclick="openModal('Member 15')"><img src="https://i.postimg.cc/sDYkJ2NL/15.png" class="student-img"><div class="student-info"><div class="student-no">Member 15</div></div></div>
-        <div class="student-card" onclick="openModal('Member 16')"><img src="https://i.postimg.cc/JhBkHSpQ/16.png" class="student-img"><div class="student-info"><div class="student-no">Member 16</div></div></div>
-        <div class="student-card" onclick="openModal('Member 17')"><img src="https://i.postimg.cc/25BZLg0w/17.png" class="student-img"><div class="student-info"><div class="student-no">Member 17</div></div></div>
-        <div class="student-card" onclick="openModal('Member 18')"><img src="https://i.postimg.cc/6QGv4FMz/18.png" class="student-img"><div class="student-info"><div class="student-no">Member 18</div></div></div>
-        <div class="student-card" onclick="openModal('Member 19')"><img src="https://i.postimg.cc/Pq8wv0SV/19.png" class="student-img"><div class="student-info"><div class="student-no">Member 19</div></div></div>
-        <div class="student-card" onclick="openModal('Member 20')"><img src="https://i.postimg.cc/rptrR7fv/20.png" class="student-img"><div class="student-info"><div class="student-no">Member 20</div></div></div>
-        <div class="student-card" onclick="openModal('Member 21')"><img src="https://i.postimg.cc/zfRgH4x6/21.png" class="student-img"><div class="student-info"><div class="student-no">Member 21</div></div></div>
-        <div class="student-card" onclick="openModal('Member 22')"><img src="https://i.postimg.cc/SKzMYHg5/22.png" class="student-img"><div class="student-info"><div class="student-no">Member 22</div></div></div>
-        <div class="student-card" onclick="openModal('Member 23')"><img src="https://i.postimg.cc/6QGv4FHs/23.png" class="student-img"><div class="student-info"><div class="student-no">Member 23</div></div></div>
-        <div class="student-card" onclick="openModal('Member 24')"><img src="https://i.postimg.cc/LsZ1gGyF/24.png" class="student-img"><div class="student-info"><div class="student-no">Member 24</div></div></div>
-        <div class="student-card" onclick="openModal('Member 25')"><img src="https://i.postimg.cc/LsZ1gGyM/25.png" class="student-img"><div class="student-info"><div class="student-no">Member 25</div></div></div>
-        <div class="student-card" onclick="openModal('Member 26')"><img src="https://i.postimg.cc/XvyCBt2b/26.png" class="student-img"><div class="student-info"><div class="student-no">Member 26</div></div></div>
-        <div class="student-card" onclick="openModal('Member 27')"><img src="https://i.postimg.cc/xdbzNBsQ/27.png" class="student-img"><div class="student-info"><div class="student-no">Member 27</div></div></div>
-        <div class="student-card" onclick="openModal('Member 28')"><img src="https://i.postimg.cc/1zNqVbW9/28.png" class="student-img"><div class="student-info"><div class="student-no">Member 28</div></div></div>
-        <div class="student-card" onclick="openModal('Member 29')"><img src="https://i.postimg.cc/wBsmRnWx/29.png" class="student-img"><div class="student-info"><div class="student-no">Member 29</div></div></div>
-        <div class="student-card" onclick="openModal('Member 30')"><img src="https://i.postimg.cc/SsFz6V5b/30.png" class="student-img"><div class="student-info"><div class="student-no">Member 30</div></div></div>
-        <div class="student-card" onclick="openModal('Member 31')"><img src="https://i.postimg.cc/qRVCsQYT/31.png" class="student-img"><div class="student-info"><div class="student-no">Member 31</div></div></div>
+        <div class="student-card" onclick="openModal('Member 01', 'https://i.postimg.cc/52rz0fSL/1.png')"><img src="https://i.postimg.cc/52rz0fSL/1.png" class="student-img"><div class="student-info"><div class="student-no">Member 01</div></div></div>
+        <div class="student-card" onclick="openModal('Member 02', 'https://i.postimg.cc/fRPdLMfS/2.jpg')"><img src="https://i.postimg.cc/fRPdLMfS/2.jpg" class="student-img"><div class="student-info"><div class="student-no">Member 02</div></div></div>
+        <div class="student-card" onclick="openModal('Member 03', 'https://i.postimg.cc/y8GRd7y0/3.png')"><img src="https://i.postimg.cc/y8GRd7y0/3.png" class="student-img"><div class="student-info"><div class="student-no">Member 03</div></div></div>
+        <div class="student-card" onclick="openModal('Member 04', 'https://i.postimg.cc/K8WTzmD7/4.png')"><img src="https://i.postimg.cc/K8WTzmD7/4.png" class="student-img"><div class="student-info"><div class="student-no">Member 04</div></div></div>
+        <div class="student-card" onclick="openModal('Member 05', 'https://i.postimg.cc/HkNMxT9Q/5.png')"><img src="https://i.postimg.cc/HkNMxT9Q/5.png" class="student-img"><div class="student-info"><div class="student-no">Member 05</div></div></div>
     </div>
 </div>
-
-<footer style="text-align: center; padding: 60px 0; color: #999; font-size: 0.8rem;">
-    © 2026 EEE434 KMUTT. All Rights Reserved.
-</footer>
 
 <div id="answerModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <div class="modal-header">
             <h3>ส่งคำตอบ</h3>
-            <p id="studentNameDisplay" style="color: #666; margin-top: 5px;">Member Name</p>
+            <p id="studentNameDisplay" style="color: #666;">Member Name</p>
         </div>
-        
         <form id="submissionForm" onsubmit="submitAnswer(event)">
             <input type="hidden" id="studentIdInput">
+            <input type="hidden" id="studentImgInput">
             
             <div class="form-group">
-                <label class="form-label">เลือกคำตอบ (True/False)</label>
+                <label class="form-label">เลือกคำตอบ</label>
                 <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="tf_answer" value="True" required> ถูก (True)
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="tf_answer" value="False"> ผิด (False)
-                    </label>
+                    <label class="radio-option"><input type="radio" name="tf_answer" value="True" required> ถูก (True)</label>
+                    <label class="radio-option"><input type="radio" name="tf_answer" value="False"> ผิด (False)</label>
                 </div>
             </div>
-
             <div class="form-group">
-                <label class="form-label">คำตอบเพิ่มเติม / เหตุผล</label>
+                <label class="form-label">คำตอบเพิ่มเติม</label>
                 <textarea id="textAnswer" placeholder="พิมพ์คำตอบของคุณที่นี่..."></textarea>
             </div>
-
             <button type="submit" class="submit-btn">ส่งคำตอบ</button>
         </form>
     </div>
 </div>
 
 <script>
-    // เปิด Modal
-    function openModal(memberId) {
+    function openModal(name, img) {
         document.getElementById('answerModal').style.display = 'block';
-        document.getElementById('studentNameDisplay').innerText = 'สำหรับ: ' + memberId;
-        document.getElementById('studentIdInput').value = memberId;
-        
-        // Reset form
+        document.getElementById('studentNameDisplay').innerText = 'สำหรับ: ' + name;
+        document.getElementById('studentIdInput').value = name;
+        document.getElementById('studentImgInput').value = img;
         document.getElementById('submissionForm').reset();
     }
 
-    // ปิด Modal
     function closeModal() {
         document.getElementById('answerModal').style.display = 'none';
     }
 
-    // เมื่อกดคลิกพื้นที่นอก Modal ให้ปิด Modal ด้วย
-    window.onclick = function(event) {
-        var modal = document.getElementById('answerModal');
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
+    window.onclick = function(e) {
+        if (e.target == document.getElementById('answerModal')) closeModal();
     }
 
-    // ฟังก์ชันส่งคำตอบ (จำลองการทำงาน)
     function submitAnswer(event) {
-        event.preventDefault(); // ป้องกันเว็บรีเฟรช
+        event.preventDefault();
 
-        const member = document.getElementById('studentIdInput').value;
-        const tf = document.querySelector('input[name="tf_answer"]:checked').value;
-        const text = document.getElementById('textAnswer').value;
+        // 1. รับค่าจากฟอร์ม
+        const name = document.getElementById('studentIdInput').value;
+        const img = document.getElementById('studentImgInput').value;
+        const choice = document.querySelector('input[name="tf_answer"]:checked').value;
+        const note = document.getElementById('textAnswer').value;
+        const timestamp = new Date(); // เวลาปัจจุบัน
 
-        // ตรงนี้คือส่วนที่เอาไปเชื่อมกับ Backend ในอนาคต
-        console.log("Sending Data:", {
-            member: member,
-            isTrue: tf,
-            answer: text
-        });
+        // 2. สร้าง Object ข้อมูล
+        const newData = {
+            name: name,
+            img: img,
+            choice: choice,
+            note: note,
+            time: timestamp.getTime(), // ใช้เทียบเวลา
+            timeString: timestamp.toLocaleTimeString('th-TH') // เก็บเวลาแบบอ่านง่าย
+        };
 
-        // แจ้งเตือนผู้ใช้
-        alert("บันทึกคำตอบของ " + member + " เรียบร้อยแล้ว!\nเลือก: " + tf);
+        // 3. ดึงข้อมูลเก่าจาก LocalStorage (ถ้ามี)
+        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
         
-        closeModal();
+        // 4. เพิ่มข้อมูลใหม่เข้าไป
+        allData.push(newData);
+
+        // 5. บันทึกกลับลงไป
+        localStorage.setItem('eee434_responses', JSON.stringify(allData));
+
+        // 6. ไปหน้า Result
+        window.location.href = 'result.html';
     }
 </script>
 
