@@ -54,6 +54,30 @@
             .header-text { border-left: none; padding-left: 0; border-top: 1px solid #eee; padding-top: 20px; width: 100%; }
             .instructor-box { flex-direction: column; text-align: center; padding: 30px 20px; gap: 20px; }
         }
+
+        /* --- CSS เพิ่มเติมสำหรับการ์ดที่ส่งแล้ว --- */
+        .student-card.submitted {
+            opacity: 0.6;
+            filter: grayscale(100%);
+            pointer-events: none; /* ปิดการคลิก */
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .student-card.submitted::after {
+            content: "ส่งแล้ว";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--kmutt-orange);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -88,7 +112,7 @@
     </div>
 
     <h2 class="section-title">สมาชิกในคลาส <span style="font-size: 1rem; color: #666; font-weight: normal;">(คลิกที่รูปเพื่อส่งคำตอบ)</span></h2>
-    <div class="student-grid">
+    <div class="student-grid" id="studentGrid">
         <div class="student-card" onclick="openModal('Member 01', 'https://i.postimg.cc/52rz0fSL/1.png')"><img src="https://i.postimg.cc/52rz0fSL/1.png" class="student-img"><div class="student-info"><div class="student-no">Member 01</div></div></div>
         <div class="student-card" onclick="openModal('Member 02', 'https://i.postimg.cc/fRPdLMfS/2.jpg')"><img src="https://i.postimg.cc/fRPdLMfS/2.jpg" class="student-img"><div class="student-info"><div class="student-no">Member 02</div></div></div>
         <div class="student-card" onclick="openModal('Member 03', 'https://i.postimg.cc/y8GRd7y0/3.png')"><img src="https://i.postimg.cc/y8GRd7y0/3.png" class="student-img"><div class="student-info"><div class="student-no">Member 03</div></div></div>
@@ -155,28 +179,65 @@
 </div>
 
 <script>
+    // เมื่อโหลดหน้าเว็บ ให้เช็คว่าใครส่งแล้วบ้าง
+    window.onload = function() {
+        updateGridStatus();
+    };
+
+    function updateGridStatus() {
+        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
+        
+        // ดึงรายชื่อคนที่ส่งแล้วมาเก็บไว้ใน Array
+        let submittedNames = allData.map(item => item.name);
+        
+        // วนลูปการ์ดนักเรียนทั้งหมด
+        let cards = document.querySelectorAll('.student-card');
+        cards.forEach(card => {
+            // หาชื่อใน Card นั้นๆ
+            let nameInCard = card.querySelector('.student-no').innerText;
+            
+            // ถ้าชื่อนี้อยู่ในรายการที่ส่งแล้ว
+            if (submittedNames.includes(nameInCard)) {
+                card.classList.add('submitted'); // เพิ่ม Class CSS เพื่อทำให้เป็นสีเทาและคลิกไม่ได้
+                card.onclick = null; // เอา Event Click ออกเพื่อความชัวร์
+            } else {
+                card.classList.remove('submitted'); // ถ้า Reset ข้อมูล ก็เอา Class ออก
+                // คืนค่า onclick กลับมา (ใช้ logic ง่ายๆ คือ set attribute ใหม่)
+                // แต่เนื่องจากเรา reload หน้าหลังจาก reset อยู่แล้ว ส่วนนี้จึงทำงานอัตโนมัติตอนโหลดหน้าใหม่
+            }
+        });
+    }
+
     function openModal(name, img) {
+        // เช็คซ้ำอีกครั้งก่อนเปิด (เผื่อกรณีแฮก HTML)
+        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
+        if (allData.some(item => item.name === name)) {
+            alert("สมาชิกท่านนี้ได้ส่งคำตอบไปแล้ว!");
+            return;
+        }
+
         document.getElementById('answerModal').style.display = 'block';
         document.getElementById('studentNameDisplay').innerText = 'สำหรับ: ' + name;
         document.getElementById('studentIdInput').value = name;
         document.getElementById('studentImgInput').value = img;
         document.getElementById('submissionForm').reset();
     }
+
     function closeModal() {
         document.getElementById('answerModal').style.display = 'none';
     }
+
     window.onclick = function(event) {
         if (event.target == document.getElementById('answerModal')) closeModal();
     }
 
-    // --- แก้ไขรหัสผ่านตรงนี้ ---
     function adminReset() {
         const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
-        if (password === "00000") { // รหัสผ่านใหม่ 00000
-            if(confirm("ยืนยันการล้างข้อมูลทั้งหมดหรือไม่?")) {
+        if (password === "00000") { // รหัสผ่าน 00000
+            if(confirm("ยืนยันการล้างข้อมูลทั้งหมดหรือไม่? (ผู้ใช้จะสามารถส่งคำตอบใหม่ได้)")) {
                 localStorage.removeItem('eee434_responses');
                 alert("ล้างข้อมูลเรียบร้อยแล้ว");
-                location.reload();
+                location.reload(); // รีโหลดหน้าใหม่เพื่อให้สถานะการ์ดกลับมาปกติ
             }
         } else if (password !== null) {
             alert("รหัสผ่านไม่ถูกต้อง!");
@@ -186,6 +247,14 @@
     function submitAnswer(event) {
         event.preventDefault();
         const name = document.getElementById('studentIdInput').value;
+        
+        // เช็คซ้ำก่อนบันทึก
+        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
+        if (allData.some(item => item.name === name)) {
+            alert("ไม่สามารถส่งซ้ำได้");
+            return;
+        }
+
         const img = document.getElementById('studentImgInput').value;
         const choice = document.querySelector('input[name="tf_answer"]:checked').value;
         const note = document.getElementById('textAnswer').value;
@@ -199,9 +268,10 @@
             time: timestamp.getTime()
         };
 
-        let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
         allData.push(newData);
         localStorage.setItem('eee434_responses', JSON.stringify(allData));
+        
+        // ไปหน้า Result
         window.location.href = 'result.html';
     }
 </script>
