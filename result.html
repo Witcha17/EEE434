@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Board | EEE434</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --kmutt-orange: #e74010; --dark-grey: #333333; --light-bg: #f0f2f5; --white: #ffffff; }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--light-bg); margin: 0; padding: 0; color: var(--dark-grey); }
+
+        .header-result { background: var(--white); padding: 20px; text-align: center; border-bottom: 5px solid var(--kmutt-orange); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .header-result h1 { margin: 0; color: var(--kmutt-orange); }
+        .header-result p { color: #666; margin-top: 5px; }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 15px; background: #fff5f2; color: var(--kmutt-orange); font-weight: 600; border-radius: 8px 8px 0 0; }
+        td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #fcfcfc; }
+
+        .rank-badge {
+            background: var(--dark-grey); color: white; width: 30px; height: 30px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;
+        }
+        .rank-1 { background: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); border: 2px solid white; }
+        .rank-2 { background: #C0C0C0; }
+        .rank-3 { background: #CD7F32; }
+
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .user-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
+        .user-name { font-weight: 500; font-size: 1.1rem; }
+
+        .answer-tag {
+            padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; display: inline-block;
+        }
+        .ans-true { background-color: #e6f4ea; color: #1e7e34; }
+        .ans-false { background-color: #fce8e6; color: #c5221f; }
+
+        .time-stamp { color: #888; font-size: 0.9rem; font-family: monospace; }
+        .note-text { display: block; font-size: 0.85rem; color: #999; margin-top: 5px; font-style: italic; }
+
+        .back-btn {
+            display: inline-block; margin-top: 20px; text-decoration: none;
+            color: var(--kmutt-orange); border: 1px solid var(--kmutt-orange); padding: 10px 25px; border-radius: 50px; transition: all 0.3s;
+        }
+        .back-btn:hover { background: var(--kmutt-orange); color: white; }
+
+        /* Animation for new row */
+        .new-entry { animation: highlight 2s ease-out; }
+        @keyframes highlight { 0% { background-color: rgba(231, 64, 16, 0.2); } 100% { background-color: transparent; } }
+    </style>
+</head>
+<body>
+
+<div class="header-result">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+        <img src="https://i.postimg.cc/Qx2b4gRt/Electrical.png" height="50">
+        <div>
+            <h1>Live Submission Results</h1>
+            <p>ลำดับการส่งคำตอบ EEE434</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="result-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0;">รายการส่งคำตอบล่าสุด</h2>
+            <button onclick="clearData()" style="font-size: 0.8rem; color: #999; background: none; border: none; cursor: pointer;">[ล้างประวัติ]</button>
+        </div>
+        
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th width="10%">#</th>
+                    <th width="40%">สมาชิก</th>
+                    <th width="20%">คำตอบ</th>
+                    <th width="30%">เวลาที่ส่ง (วินาที)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+
+        <div style="text-align: center;">
+            <a href="index.html" class="back-btn">← กลับไปหน้าเลือกสมาชิก</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. ดึงข้อมูล
+    let allData = JSON.parse(localStorage.getItem('eee434_responses')) || [];
+
+    // 2. เรียงลำดับตามเวลา (น้อยไปมาก = ส่งก่อนขึ้นก่อน)
+    allData.sort((a, b) => a.time - b.time);
+
+    const tbody = document.getElementById('tableBody');
+
+    // 3. วนลูปสร้างแถวตาราง
+    if (allData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; py-5; color:#999;">ยังไม่มีการส่งคำตอบ</td></tr>';
+    } else {
+        allData.forEach((item, index) => {
+            let rankClass = '';
+            if (index === 0) rankClass = 'rank-1';
+            else if (index === 1) rankClass = 'rank-2';
+            else if (index === 2) rankClass = 'rank-3';
+
+            let ansClass = item.choice === 'True' ? 'ans-true' : 'ans-false';
+            
+            // คำนวณเวลาละเอียด (ดึง Milliseconds มาแสดงเพื่อให้เห็นความต่าง)
+            let dateObj = new Date(item.time);
+            let timeStr = dateObj.toLocaleTimeString('th-TH') + '.' + Math.floor(dateObj.getMilliseconds() / 10).toString().padStart(2, '0');
+
+            // ตรวจสอบว่าเป็นข้อมูลล่าสุดหรือไม่ (เพื่อทำ Highlight)
+            let isLatest = (index === allData.length - 1); 
+            
+            let row = `
+                <tr class="${isLatest ? 'new-entry' : ''}">
+                    <td><div class="rank-badge ${rankClass}">${index + 1}</div></td>
+                    <td>
+                        <div class="user-profile">
+                            <img src="${item.img || 'https://via.placeholder.com/50'}" class="user-img">
+                            <div>
+                                <div class="user-name">${item.name}</div>
+                                ${item.note ? `<span class="note-text">"${item.note}"</span>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="answer-tag ${ansClass}">${item.choice}</span></td>
+                    <td><span class="time-stamp">⏱ ${timeStr} วินาที</span></td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function clearData() {
+        if(confirm('ต้องการลบประวัติการส่งทั้งหมดหรือไม่?')) {
+            localStorage.removeItem('eee434_responses');
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>
