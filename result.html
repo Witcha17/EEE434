@@ -6,8 +6,7 @@
     <title>Result Board | EEE434</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-         /* กำหนดตัวแปรสีสำหรับ Light Mode */
-         :root {
+        :root {
             --kmutt-orange: #e74010;
             --main-text: #333333;
             --sub-text: #666666;
@@ -20,7 +19,6 @@
             --shadow-color: rgba(0,0,0,0.1);
         }
 
-        /* กำหนดตัวแปรสีสำหรับ Dark Mode */
         [data-theme="dark"] {
             --main-text: #e0e0e0;
             --sub-text: #b0b0b0;
@@ -34,103 +32,52 @@
         }
 
         body { font-family: 'Kanit', sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--main-text); transition: background-color 0.3s, color 0.3s; }
-
         .header-result { background: var(--bg-header); padding: 20px; text-align: center; border-bottom: 5px solid var(--kmutt-orange); box-shadow: 0 5px 15px var(--shadow-color); transition: background-color 0.3s; }
-        /* เพิ่มพื้นหลังขาวจางๆ ให้โลโก้ใน Dark Mode */
         [data-theme="dark"] .header-result img { background: rgba(255,255,255,0.1); padding: 5px; border-radius: 8px; }
         .header-result h1 { margin: 0; color: var(--kmutt-orange); }
         .header-result p { color: var(--sub-text); margin-top: 5px; }
 
         .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
 
-        .result-card {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            overflow-x: auto;
-            color: var(--main-text);
-            transition: background-color 0.3s;
-        }
+        /* สไตล์ Dashboard สถิติ */
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--bg-card); padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px var(--shadow-color); border: 1px solid var(--border-color); }
+        .stat-number { font-size: 1.8rem; font-weight: 600; color: var(--kmutt-orange); }
+        .stat-label { font-size: 0.85rem; color: var(--sub-text); }
 
+        .result-card { background: var(--bg-card); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px var(--shadow-color); overflow-x: auto; color: var(--main-text); transition: background-color 0.3s; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 500px; }
         th { text-align: left; padding: 15px; background: var(--th-bg); color: var(--kmutt-orange); font-weight: 600; border-radius: 8px 8px 0 0; }
         td { padding: 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background-color: var(--table-hover); }
 
-        .rank-badge {
-            background: #333; color: white; width: 30px; height: 30px; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;
-        }
-        /* ปรับสี Rank badge ใน Darkmode นิดหน่อยให้ไม่จม */
+        .rank-badge { background: #333; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
         [data-theme="dark"] .rank-badge { background: #555; }
-        .rank-1 { background: #FFD700 !important; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); border: 2px solid white; color: #333 !important; }
+        .rank-1 { background: #FFD700 !important; color: #333 !important; border: 2px solid white; }
         .rank-2 { background: #C0C0C0 !important; color: #333 !important; }
         .rank-3 { background: #CD7F32 !important; color: #333 !important; }
 
         .user-profile { display: flex; align-items: center; gap: 15px; }
         .user-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); }
         .user-name { font-weight: 500; font-size: 1.1rem; }
-
-        .answer-tag {
-            padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; display: inline-block;
-        }
+        .answer-tag { padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; display: inline-block; }
         .ans-true { background-color: #e6f4ea; color: #1e7e34; }
         .ans-false { background-color: #fce8e6; color: #c5221f; }
-        
-        /* ปรับสี Tag คำตอบใน Dark mode ให้อ่านง่าย */
         [data-theme="dark"] .ans-true { background-color: #1e3a26; color: #6fcf8a; }
         [data-theme="dark"] .ans-false { background-color: #3e1b1b; color: #f58886; }
 
         .time-stamp { color: var(--sub-text); font-size: 0.9rem; font-family: monospace; }
         .note-text { display: block; font-size: 0.85rem; color: var(--sub-text); margin-top: 5px; font-style: italic; }
-
-        .back-btn {
-            display: inline-block; margin-top: 20px; text-decoration: none;
-            color: var(--kmutt-orange); border: 1px solid var(--kmutt-orange); padding: 10px 25px; border-radius: 50px; transition: all 0.3s;
-        }
+        .back-btn { display: inline-block; margin-top: 20px; text-decoration: none; color: var(--kmutt-orange); border: 1px solid var(--kmutt-orange); padding: 10px 25px; border-radius: 50px; transition: all 0.3s; }
         .back-btn:hover { background: var(--kmutt-orange); color: white; }
+        .theme-toggle { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background-color: var(--kmutt-orange); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; z-index: 3000; }
 
-        .new-entry { animation: highlight 2s ease-out; }
-        @keyframes highlight { 0% { background-color: rgba(231, 64, 16, 0.2); } 100% { background-color: transparent; } }
-
-        /* Theme Toggle Button */
-        .theme-toggle {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background-color: var(--kmutt-orange);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: none;
-            z-index: 3000;
-            transition: transform 0.3s;
-        }
-        .theme-toggle:hover { transform: scale(1.1); }
-
-        /* ================= RESPONSIVE DESIGN ================= */
         @media (max-width: 768px) {
-            .header-result > div { flex-direction: column; }
-            .header-result img { height: 60px !important; margin-bottom: 10px; }
-            .header-result h1 { font-size: 1.5rem; }
-            .container { margin: 20px auto; padding: 0 15px; }
-            .result-card { padding: 15px; }
-            th, td { padding: 10px 8px; font-size: 0.9rem; }
-            .user-img { width: 35px; height: 35px; }
-            .user-name { font-size: 0.9rem; }
-            .rank-badge { width: 25px; height: 25px; font-size: 0.8rem; }
-            .answer-tag { padding: 3px 10px; font-size: 0.8rem; }
-            .time-stamp { font-size: 0.8rem; }
-            .theme-toggle { bottom: 20px; right: 20px; width: 45px; height: 45px; font-size: 20px; }
+            .stats-container { gap: 10px; }
+            .stat-box { padding: 15px; }
+            .stat-number { font-size: 1.4rem; }
+            th, td { padding: 10px 8px; font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -147,6 +94,21 @@
 </header>
 
 <div class="container">
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-number" id="totalCount">0</div>
+            <div class="stat-label">ส่งแล้ว (คน)</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number" id="trueCount" style="color: #1e7e34;">0</div>
+            <div class="stat-label">ตอบ True</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number" id="falseCount" style="color: #c5221f;">0</div>
+            <div class="stat-label">ตอบ False</div>
+        </div>
+    </div>
+
     <div class="result-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2 style="margin: 0; font-size: 1.4rem;">รายการส่งคำตอบล่าสุด</h2>
@@ -162,8 +124,7 @@
                     <th width="30%">เวลา</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
 
         <div style="text-align: center;">
@@ -172,63 +133,56 @@
     </div>
 </div>
 
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
-    🌙
-</button>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
 
 <script type="module">
-    // Import Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // --- 🔴 ใส่ Config ตัวเดิมที่ได้จากขั้นตอนที่ 1 ---
     const firebaseConfig = {
-          apiKey: "AIzaSyCOO20iOMb2bWWcUoqmq3OXE2TtbSgG1ik",
-          authDomain: "eee434-project.firebaseapp.com",
-          databaseURL: "https://eee434-project-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "eee434-project",
-          storageBucket: "eee434-project.firebasestorage.app",
-          messagingSenderId: "691440469916",
-          appId: "1:691440469916:web:c7bb0dd04255fd4821aa59"
+        apiKey: "AIzaSyCOO20iOMb2bWWcUoqmq3OXE2TtbSgG1ik",
+        authDomain: "eee434-project.firebaseapp.com",
+        databaseURL: "https://eee434-project-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "eee434-project",
+        storageBucket: "eee434-project.firebasestorage.app",
+        messagingSenderId: "691440469916",
+        appId: "1:691440469916:web:c7bb0dd04255fd4821aa59"
     };
-    // ------------------------------------------------
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const dbRef = ref(db, 'responses');
     const tbody = document.getElementById('tableBody');
 
-    // --- ทำงาน Realtime: เมื่อมีคนส่ง ข้อมูลจะเด้งขึ้นมาเอง ---
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         let allData = data ? Object.values(data) : [];
-        
-        // เรียงลำดับตามเวลา
         allData.sort((a, b) => a.time - b.time);
-        
         renderTable(allData);
     });
 
     function renderTable(allData) {
-        if (allData.length === 0) {
+        // อัปเดตตัวเลขสถิติ
+        const total = allData.length;
+        const trueAns = allData.filter(i => i.choice === 'True').length;
+        const falseAns = allData.filter(i => i.choice === 'False').length;
+
+        document.getElementById('totalCount').innerText = total;
+        document.getElementById('trueCount').innerText = trueAns;
+        document.getElementById('falseCount').innerText = falseAns;
+
+        if (total === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color:var(--sub-text);">ยังไม่มีการส่งคำตอบ</td></tr>';
         } else {
-            tbody.innerHTML = ''; // เคลียร์ของเก่า
+            tbody.innerHTML = '';
             allData.forEach((item, index) => {
-                let rankClass = '';
-                if (index === 0) rankClass = 'rank-1';
-                else if (index === 1) rankClass = 'rank-2';
-                else if (index === 2) rankClass = 'rank-3';
-
+                let rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
                 let ansClass = item.choice === 'True' ? 'ans-true' : 'ans-false';
                 let dateObj = new Date(item.time);
                 let timeStr = dateObj.toLocaleTimeString('th-TH') + '.' + Math.floor(dateObj.getMilliseconds() / 10).toString().padStart(2, '0');
                 
-                // เช็คว่าเป็นข้อมูลล่าสุดหรือไม่ (Logic คร่าวๆ)
-                let isLatest = (index === allData.length - 1); 
-                
-                let row = `
-                    <tr class="${isLatest ? 'new-entry' : ''}">
+                tbody.innerHTML += `
+                    <tr>
                         <td><div class="rank-badge ${rankClass}">${index + 1}</div></td>
                         <td>
                             <div class="user-profile">
@@ -243,24 +197,17 @@
                         <td><span class="time-stamp">${timeStr}</span></td>
                     </tr>
                 `;
-                tbody.innerHTML += row;
             });
         }
     }
 
-    // ฟังก์ชันล้างข้อมูล (Admin)
     window.clearData = function() {
-        const password = prompt("กรุณาใส่รหัสผ่าน Admin เพื่อล้างข้อมูล:");
-        if (password === "00000") {
-            if(confirm('ยืนยันการลบประวัติการส่งทั้งหมดบน Server หรือไม่?')) {
-                remove(dbRef); // ลบจาก Firebase แล้วทุกเครื่องจะหายไปเอง
-            }
-        } else if (password !== null) {
-            alert("รหัสผ่านไม่ถูกต้อง!");
-        }
+        const pw = prompt("Admin Password:");
+        if (pw === "00000") {
+            if(confirm('Delete all records?')) remove(dbRef);
+        } else if (pw !== null) alert("Wrong password!");
     }
 
-    // Theme Logic
     const themeToggleBtn = document.getElementById('themeToggle');
     const htmlEl = document.documentElement;
     if (localStorage.getItem('theme') === 'dark') {
@@ -279,6 +226,5 @@
         }
     }
 </script>
-
 </body>
 </html>
